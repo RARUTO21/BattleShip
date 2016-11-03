@@ -3,59 +3,261 @@ from tkinter import *
 import random
 import threading
 import time
+import math
 
 nombreJugador = ""
 TiempoJuego=0
-MatrizUsuario=[['0','0','0','0','0','0','0','0','0','0'],['0','0','0','0','0','0','0','0','0','0'],['0','0','0','0','0','0','0','0','0','0'],['0','0','0','0','0','0','0','0','0','0'],['0','0','0','0','0','0','0','0','0','0'],['0','0','0','0','0','0','0','0','0','0'],['0','0','0','0','0','0','0','0','0','0'],['0','0','0','0','0','0','0','0','0','0'],['0','0','0','0','0','0','0','0','0','0'],['0','0','0','0','0','0','0','0','0','0']]
-MatrizCompu=[]
+MatrizUsuario=[ ['3','3','3','3','0','0','-1','0','0','0'],
+                ['0','0','0','0','0','0','0','0','0','0'],
+                ['0','0','X','0','0','0','0','0','0','0'],
+                ['0','0','0','0','4','0','0','0','0','0'],
+                ['0','0','0','0','0','0','0','0','0','0'],
+                ['0','0','0','0','0','0','0','0','0','0'],
+                ['1','0','2','2','0','0','0','0','0','0'],
+                ['1','0','0','0','0','0','0','0','0','0'],
+                ['1','0','0','0','0','0','0','0','0','0'],
+                ['0','0','0','0','0','0','0','0','0','0']]
+#MatrizCompu=[]
 numeroBarco=1
 
 
 def iniciar():
-        #ventanaPrincipal.withdraw()
+        #ventanaJuego.withdraw()
         None
 
 
 #Configuracion de la ventana principal
-ventanaPrincipal = Tk()
-ventanaPrincipal.title("BattleShip")
-ventanaPrincipal.geometry("1280x768")
-ventanaPrincipal.config(bg="gray25")
-ventanaPrincipal.resizable(0,0)
-
-
+ventanaMenu = Tk()
+ventanaMenu.title("Battleship")
+ventanaMenu.geometry("1280x768")
+ventanaMenu.config(bg="gray25")
+ventanaMenu.resizable(0,0)
 #=====================================
 
-#               TopLevels
-tpIngreseNombre = Toplevel()
-tpIngreseNombre.title("Ingrese el nombre")
-tpIngreseNombre.config(bg="black")
-tpIngreseNombre.resizable(0,0)
-tpIngreseNombre.protocol("WM_DELETE_WINDOW",iniciar)#falta conectar bien la f:iniciar()
-
+#           TopLevels
+ventanaJuego = Toplevel()
+ventanaJuego.title("Juego")
+#ventanaJuego.protocol('WM_DELETE_WINDOW', vMenu)
+ventanaJuego.config(bg="gray25")
+ventanaJuego.resizable(0,0)
 #=====================================TopLevels
 
+#             Frames
+frameVentanaJuego = Frame(ventanaJuego,bg="black",bd=0)
+frameVentanaJuego.pack()
+#=====================================Frames
+
+#       Acciones de interfaz
+def cerrarPrograma():
+        if messagebox.askyesno("Salir","Está seguro que desea salir?"):
+                ventanaJuego.destroy()
+
+def tirarBomba(matriz,btn,jugador,matrizBotones):
+        print("Valor buscado: " + btn)#btn.config('text')[-1])
+
+#==========================================================Acciones de interfaz
+
+#               Menu Ventana Juego
+barraMenu = Menu(ventanaJuego)
+menuJuego = Menu(barraMenu)
+barraMenu.add_cascade(label="Juego", menu = menuJuego)
+menuJuego.add_command(label="Guardar y salir al menú")#,command = FALTA)
+menuJuego.add_command(label="Reiniciar partida")#,command = FALTA)
+menuJuego.add_separator()
+menuJuego.add_command(label="Cerrar",command = cerrarPrograma)
+
+ventanaJuego.config(menu=barraMenu)
+#=====================================Menu Ventana Juego
 
 #                       Imagenes
 fondoPrincipal = PhotoImage(file = "Images/Battleship.gif")
+fondoMenu = PhotoImage(file = "Images/Battleship2.gif")
+cuadroCeleste = PhotoImage(file="Images/celeste2.gif")
+cuadroAzul = PhotoImage(file="Images/azul2.gif")
+cuadroRojo = PhotoImage(file="Images/rojo2.gif")
 
+barco = PhotoImage(file= "Images/barco3.gif")
+tocado = PhotoImage(file= "Images/tocado.gif")
+derribado = PhotoImage(file= "Images/derribado.gif")
+
+indice1 = PhotoImage(file= "Images/indice1.gif")
+indice2 = PhotoImage(file= "Images/indice2.gif")
+indice3 = PhotoImage(file= "Images/indice3.gif")
+indice4 = PhotoImage(file= "Images/indice4.gif")
+indice5 = PhotoImage(file= "Images/indice5.gif")
+indice6 = PhotoImage(file= "Images/indice6.gif")
+indice7 = PhotoImage(file= "Images/indice7.gif")
+indice8 = PhotoImage(file= "Images/indice8.gif")
+indice9 = PhotoImage(file= "Images/indice9.gif")
+indice10 = PhotoImage(file= "Images/indice10.gif")
+indiceA = PhotoImage(file= "Images/indiceA.gif")
+indiceB = PhotoImage(file= "Images/indiceB.gif")
+indiceC = PhotoImage(file= "Images/indiceC.gif")
+indiceD = PhotoImage(file= "Images/indiceD.gif")
+indiceE = PhotoImage(file= "Images/indiceE.gif")
+indiceF = PhotoImage(file= "Images/indiceF.gif")
+indiceG = PhotoImage(file= "Images/indiceG.gif")
+indiceH = PhotoImage(file= "Images/indiceH.gif")
+indiceI = PhotoImage(file= "Images/indiceI.gif")
+indiceJ = PhotoImage(file= "Images/indiceJ.gif")
 #===========================================================Imagenes
 
-
-
 #                 Labels
-lblFondoVentanaPrincipal = Label(ventanaPrincipal,image=fondoPrincipal,bg="black")
-lblFondoVentanaPrincipal.place(x=0,y=0)
-lblCronometro=Label(height=3,width=10,bg="white")
-lblCronometro.place(x=10,y=10)
+lblFondoVentanaMenu = Label(ventanaMenu,image=fondoMenu,bg="black")
+lblFondoVentanaMenu.place(x=0,y=0)
 #===========================================================Labels
 
+def pegar(matriz,x,y):
+    if(matriz[x][y]=='0'):# si pega un0 es agua
+        return "agua"
+    elif(destruido(matriz,x,y)and matriz[x][y]!='-1'):# si el barco es destruido lo marca como tal y devuelve "destruido"
+        matriz[x][y]='X'
+        return "destruido"
+    elif (matriz[x][y]=='-1'):
+            return "pego uno que ya habia golpeado antes"
+    else:
+        matriz[x][y]='-1'# si no lo destruye y no pega agua lo marco como pegado y devuelve "pegado"
+        return "pegado"
 
 
-#               Botones
+
+#               Matrices:       Juego y  Botones
+
+btnCargarPartida = Button(ventanaMenu,text="Cargar Partida",relief=RAISED)
+btnCargarPartida.place(x=100,y=400)
 
 
+
+#matrizJugador = [ [0,0,0,0,0,0,0,0,0,0],
+#                  [0,0,0,0,0,0,0,0,0,0],
+#                  [0,0,0,0,0,0,0,0,0,0],
+#                  [0,0,0,0,0,0,0,0,0,0],
+#                  [0,0,0,0,0,0,0,0,0,0],
+#                  [0,0,0,0,0,0,0,0,0,0],
+#                  [0,0,0,0,0,0,0,0,0,0],
+#                  [0,0,0,0,0,0,0,0,0,0],
+#                  [0,0,0,0,0,0,0,0,0,0],
+#                  [0,0,0,0,0,0,0,0,0,0] ]
+
+matrizCompu =   [ ['0','0','0','0','0','0','0','0','0','0'],
+                  ['0','0','0','0','0','0','0','0','0','0'],
+                  ['0','0','0','0','0','0','0','0','0','0'],
+                  ['0','0','0','0','0','0','0','0','0','0'],
+                  ['0','-1','0','0','0','0','0','0','0','0'],
+                  ['0','-1','0','0','X','-1','-1','0','0','0'],
+                  ['0','-1','0','0','0','0','0','0','0','0'],
+                  ['0','X','0','0','0','0','0','0','0','0'],
+                  ['0','0','0','0','-1','0','0','0','0','0'],
+                  ['4','4','0','0','X','0','0','0','0','5'] ]
+
+matrizBotonesJ= [ [0,0,0,0,0,0,0,0,0,0],
+                  [0,0,0,0,0,0,0,0,0,0],
+                  [0,0,0,0,0,0,0,0,0,0],
+                  [0,0,0,0,0,0,0,0,0,0],
+                  [0,0,0,0,0,0,0,0,0,0],
+                  [0,0,0,0,0,0,0,0,0,0],
+                  [0,0,0,0,0,0,0,0,0,0],
+                  [0,0,0,0,0,0,0,0,0,0],
+                  [0,0,0,0,0,0,0,0,0,0],
+                  [0,0,0,0,0,0,0,0,0,0] ]
+
+matrizBotonesC= [ [0,0,0,0,0,0,0,0,0,0],
+                  [0,0,0,0,0,0,0,0,0,0],
+                  [0,0,0,0,0,0,0,0,0,0],
+                  [0,0,0,0,0,0,0,0,0,0],
+                  [0,0,0,0,0,0,0,0,0,0],
+                  [0,0,0,0,0,0,0,0,0,0],
+                  [0,0,0,0,0,0,0,0,0,0],
+                  [0,0,0,0,0,0,0,0,0,0],
+                  [0,0,0,0,0,0,0,0,0,0],
+                  [0,0,0,0,0,0,0,0,0,0] ]
+
+def obtenerBotonIndice(row,column):
+        numeros = ["",indice1,indice2,indice3,indice4,indice5,indice6,indice7,indice8,indice9,indice10]
+        letras = ["",indiceA,indiceB,indiceC,indiceD,indiceE,indiceF,indiceG,indiceH,indiceI,indiceJ]
+        
+        if row == 0:
+          return Button(frameVentanaJuego,image = numeros[column], background="blue3", activebackground = "blue",state=DISABLED)
+
+        if column == 0:
+          return Button(frameVentanaJuego,image = letras[row], background="blue3", activebackground = "blue",state=DISABLED)
+
+def crearMatrizBotonesJ():
+    global matrizBotonesJ
+    global MatrizUsuario
+    
+    for i in range(0,10):
+        for j in range(0,10):
+            if i == 0: #Fila 0
+                btnIndiceColumna = obtenerBotonIndice(i,j+1)
+                btnIndiceColumna.grid(row = i,column = j+1)
+            if j == 0: #Columna 0
+                btnIndiceFila = obtenerBotonIndice(i+1,j)
+                btnIndiceFila.grid(row = i+1,column = j)
+
+            if MatrizUsuario[i][j] == "0":
+                btn = Button(frameVentanaJuego,image = cuadroCeleste,background="blue3",activebackground="blue",state=DISABLED)
+                btn.grid(row = i+1, column = j+1)
+                matrizBotonesJ[i][j] = btn
+                
+            elif MatrizUsuario[i][j] == "-1":
+                btn = Button(frameVentanaJuego,image = tocado,background="blue3",activebackground="blue",state=DISABLED)
+                btn.grid(row = i+1, column = j+1)
+                matrizBotonesJ[i][j] = btn
+
+            elif MatrizUsuario[i][j] == "X":
+                btn = Button(frameVentanaJuego,image = derribado,background="blue3",activebackground="blue",state=DISABLED)
+                btn.grid(row = i+1, column = j+1)
+                matrizBotonesJ[i][j] = btn
+            else:
+                btn = Button(frameVentanaJuego,image = barco,background="blue3",activebackground="blue",state=DISABLED)
+                btn.grid(row = i+1, column = j+1)
+                matrizBotonesJ[i][j] = btn
+
+                                
+crearMatrizBotonesJ()
+
+def crearMatrizBotonesC():
+    global matrizBotonesC
+    global matrizCompu
+    
+    for i in range(11,21):
+        for j in range(11,21):
+            if i == 11: #Fila 0
+                btnIndiceColumna = obtenerBotonIndice(i%11,(j%11)+1)
+                btnIndiceColumna.grid(row = i-11,column = j+1)                
+
+            if j == 11: #Columna 0
+                btnIndiceFila = obtenerBotonIndice((i%11)+1,j%11)
+                btnIndiceFila.grid(row = i-10,column = j)
+                
+            if matrizCompu[i-11][j-11] == "-1":
+                btn = Button(frameVentanaJuego,image = tocado,background="blue3",activebackground="blue",state=DISABLED)
+                btn.grid(row = i-10, column = j+1)
+                matrizBotonesJ[i-11][j-11] = btn
+
+            elif matrizCompu[i-11][j-11] == "X":
+                btn = Button(frameVentanaJuego,image = derribado,background="blue3",activebackground="blue",state=DISABLED)
+                btn.grid(row = i-10, column = j+1)
+                matrizBotonesJ[i-11][j-11] = btn
+                
+            else:
+                texto = str([i-11,j-11])
+                btn = Button(frameVentanaJuego,text=str([i-11,j-11]),image = cuadroCeleste,background="blue3",activebackground="blue",command=lambda:(tirarBomba(matrizCompu,texto,False,matrizBotonesC)))
+                btn.grid(row = i-10, column = j+1)
+                matrizBotonesJ[i-11][j-11] = btn
+
+                
+crearMatrizBotonesC()
 #==========================================================Botones
+
+#      DataEntry (Input Dialog Box) Y MessageBox de prueba para obtener el nombre del jugador
+nombreJugador = simpledialog.askstring("Digite su nombre", prompt = ' ', parent=ventanaJuego)
+messagebox.showinfo("Su nombre","Su nombre es " + nombreJugador)
+#==========================================================DataEntry y MessageBox
+
+
+
 #==========================================================Archivos
 def agregar(linea,matriz):
     linea= linea.split()
@@ -145,13 +347,26 @@ def Guardar(lista,lista2):
         
 def Cronometro():
     """funcion que realiza el trabajo en el thread"""
-    global TiempoJuego
-    while TiempoJuego < 10 :
-        TiempoJuego= TiempoJuego+1
-        time.sleep(1)
-        lblCronometro.config(text=str(TiempoJuego))
+    global TiempoJuego #hacer q el ciclo funcione con TiempoJuego
+    
+    contador=0
+    horas = 0
+    minutos = 0
+    segundos = 0
+    while True :
+        contador+=1
+        segundos +=1
+        if segundos == 60:
+          segundos = 0
+          minutos += 1
+          if minutos == 60:
+             minutos = 0
+             horas+=1
         
-        print (TiempoJuego)
+        time.sleep(1)
+        tiempo = str(horas)+":"+str(minutos)+":"+str(segundos)
+        ventanaJuego.title("Battleship -> Jugar | Tiempo del juego: " + tiempo)
+
 #==========================================================
 
 def PosicionarBarco(x,y,tamaño,orientacion):
@@ -340,17 +555,7 @@ def asignar(x,y,tamaño,orientacion):
 
 
 
-def pegar(matriz,x,y):
-    if(matriz[x][y]=='0'):# si pega un0 es agua
-        return "agua"
-    elif(destruido(matriz,x,y)and matriz[x][y]!='-1'):# si el barco es destruido lo marca como tal y devuelve "destruido"
-        matriz[x][y]='x'
-        return "destruido"
-    elif (matriz[x][y]=='-1'):
-            return "pego uno que ya habia golpeado antes"
-    else:
-        matriz[x][y]='-1'# si no lo destruye y no pega agua lo marco como pegado y devuelve "pegado"
-        return "pegado"
+
 def destruido(matriz,x,y):
     dato=matriz[x][y]# toma el numero de barco al cual se le está pegando y lo asigna a dato
     numero=0
@@ -381,7 +586,10 @@ Crono = threading.Thread(target=Cronometro)
 Crono.start()
 Inicio=threading.Thread(target=iniciar)
 Inicio.start()
-ventanaPrincipal.mainloop()
+
+ventanaJuego.mainloop()
+#ventanaMenu.mainloop()
+
 Crono.join()
 Inicio.join()
 ''' Prueba de Barcos
@@ -416,5 +624,6 @@ while(x<10):
 print("numero barco "+str(numeroBarco))
 '''
 
+iniciar()
 
 
