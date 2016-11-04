@@ -234,18 +234,20 @@ def crearMatrizBotonesC():
             if matrizCompu[i-11][j-11] == "-1":
                 btn = Button(frameVentanaJuego,image = tocado,background="blue3",activebackground="blue",state=DISABLED)
                 btn.grid(row = i-10, column = j+1)
-                matrizBotonesJ[i-11][j-11] = btn
+                matrizBotonesC[i-11][j-11] = btn
 
             elif matrizCompu[i-11][j-11] == "X":
                 btn = Button(frameVentanaJuego,image = derribado,background="blue3",activebackground="blue",state=DISABLED)
                 btn.grid(row = i-10, column = j+1)
-                matrizBotonesJ[i-11][j-11] = btn
+                matrizBotonesC[i-11][j-11] = btn
                 
             else:
+            
                 texto = str([i-11,j-11])
                 btn = Button(frameVentanaJuego,text=str([i-11,j-11]),image = cuadroCeleste,background="blue3",activebackground="blue",command=lambda:(tirarBomba(matrizCompu,texto,False,matrizBotonesC)))
                 btn.grid(row = i-10, column = j+1)
-                matrizBotonesJ[i-11][j-11] = btn
+              
+                matrizBotonesC[i-11][j-11] = btn
 
                 
 crearMatrizBotonesC()
@@ -375,21 +377,21 @@ def PosicionarBarco(x,y,tamaño,orientacion):
         if ((10-y)>=tamaño):#pregunta si el tamaño del barco cabe en posición horizontal
             if(cabe(x,y,tamaño,orientacion)):#si cabe en horizontal pregunta si otro barco impide su colocación
                 asignar(x,y,tamaño,orientacion)#si no la impide, es asiganado un nuervo barco
-                return "asignado correctamente"
+                return True
             else:
-                return "error barco no cabe"
+                return False
         else:
-            return "error, no cabe"
+            return False
     else:
         if((10-x)>=tamaño):#pregunta si el tamaño del barco cabe en posición vertical
             if(cabe(x,y,tamaño,orientacion)):#si cabe en horizontal pregunta si otro barco impide su colocación
                 asignar(x,y,tamaño,orientacion)#si no la impide, es asiganado un nuervo barco
                 
-                return "asignado correctamente"
+                return True
             else:
-                return "error barco no cabe"
+                return False
         else:
-            return "error, no cabe"
+            return False
 
 def cabe(x,y,tamaño,orientacion):
     y2=y
