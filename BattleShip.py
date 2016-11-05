@@ -17,7 +17,7 @@ MatrizUsuario=[ ['3','3','3','3','0','0','-1','0','0','0'],
                 ['1','0','0','0','0','0','0','0','0','0'],
                 ['1','0','0','0','0','0','0','0','0','0'],
                 ['0','0','0','0','0','0','0','0','0','0']]
-#MatrizCompu=[]
+MatrizCompu=[]
 numeroBarco=1
 
 
@@ -277,7 +277,7 @@ def cargarArchivo():
     
     for linea in archivo.readlines():
         agregar (linea,MatrizCompu)
-    print(MatrizCompu)
+   # print(MatrizCompu)
    # escribir(matriz)
 
 def cargarPartida():
@@ -289,12 +289,12 @@ def cargarPartida():
    # print (lista[0])
     archivo = open((nombreJugador+".txt"), "r")
     tiempo=int(archivo.readline(7))
-    print(tiempo)
+   # print(tiempo)
     matriz=0
     for linea in archivo.readlines():
         cambio=linea.split()
         if(cambio[0]=='-2'):
-            print(linea)
+           # print(linea)
             matriz=1
             #linea=linea+1
         if(matriz==0):
@@ -304,8 +304,8 @@ def cargarPartida():
             agregar(linea,MatrizCompu)
     MatrizCompu=MatrizCompu[1:]
     MatrizUsuario=MatrizUsuario2
-    print(MatrizUsuario)
-    print(MatrizCompu)
+    #print(MatrizUsuario)
+   # print(MatrizCompu)
    # escribir(matriz)
 
 def Guardar(lista,lista2):
@@ -314,7 +314,7 @@ def Guardar(lista,lista2):
     outfile = open((nombreJugador+'.txt'), 'w') # Indicamos el valor 'w'.
     outfile.write(str(tiempo))
     outfile.write("\n")
-    print(limite)
+   # print(limite)
     while (contador<limite):
          columnas=len(lista[0])-1
          contador2=0
@@ -401,7 +401,7 @@ def cabe(x,y,tamaño,orientacion):
             if(MatrizUsuario[x][y]=='0'):
                 y=y+1
                 contador=contador+1
-                print(contador)
+               # print(contador)
             else:# si lo encontrado no es un 0(agua) entonces se retorna false
                  return False
         # si habia solo agua, se llama a una función que se fija si hay limite de agua que impida su colocación
@@ -491,7 +491,7 @@ def bordesV(x,y,tamaño):
             if(MatrizUsuario[x][y+1]=='0'):
                 vacio=vacio+1
                 x=x+1
-                print("while")
+               # print("while")
             else:
                 return False
         
@@ -514,7 +514,7 @@ def bordesV(x,y,tamaño):
                 return False
         
     if(x2==0):
-        print(MatrizUsuario[x][tamaño])# si la x es 0 entonces solo revisa el limite inferior
+       # print(MatrizUsuario[x][tamaño])# si la x es 0 entonces solo revisa el limite inferior
         if(MatrizUsuario[tamaño][y]=='0'):
             return True
         return False
@@ -545,7 +545,7 @@ def asignar(x,y,tamaño,orientacion):
             MatrizUsuario[x][y]=str(numeroBarco)#recorre la matriz horizontalmente y le asigna a cada balor el numero de barco por el que se va
             y=y+1
             contador=contador+1
-            print(contador)
+           # print(contador)
            
     else:
         contador=0
@@ -584,7 +584,7 @@ def destruido(matriz,x,y):
 
 # ___________ Finalmente ___________
 
-Crono = threading.Thread(target=Cronometro)
+'''Crono = threading.Thread(target=Cronometro)
 Crono.start()
 Inicio=threading.Thread(target=iniciar)
 Inicio.start()
@@ -594,7 +594,7 @@ ventanaJuego.mainloop()
 
 Crono.join()
 Inicio.join()
-''' Prueba de Barcos
+Prueba de Barcos'''
 cargarArchivo()
 #print(pegar(8,1))
 #print(pegar(9,1))
@@ -624,8 +624,7 @@ while(x<10):
     print(MatrizUsuario[x])
     x=x+1
 print("numero barco "+str(numeroBarco))
-'''
 
-iniciar()
+
 
 
