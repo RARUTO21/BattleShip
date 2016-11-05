@@ -583,7 +583,7 @@ def destruido(matriz,x,y):
 
 # ___________ Finalmente ___________
 
-'''Crono = threading.Thread(target=Cronometro)
+Crono = threading.Thread(target=Cronometro)
 Crono.start()
 Inicio=threading.Thread(target=iniciar)
 Inicio.start()
@@ -592,8 +592,8 @@ ventanaJuego.mainloop()
 #ventanaMenu.mainloop()
 
 Crono.join()
-Inicio.join()
-Prueba de Barcos'''
+Inicio.join()'''
+Prueba de Barcos
 cargarArchivo()
 #print(pegar(8,1))
 #print(pegar(9,1))
@@ -625,5 +625,6 @@ while(x<10):
 print("numero barco "+str(numeroBarco))
 
 
+'''
 
 
