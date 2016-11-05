@@ -520,23 +520,68 @@ def cargarArchivo():
     print(MatrizCompu)
    # escribir(matriz)
 
-def Guardar(lista):
+def cargarPartida():
+    global tiempo
+    global MatrizCompu
+    global MatrizUsuario
+    #lista=["Archivo1.txt","Archivo2.txt","Archivo3.txt","Archivo4.txt"]
+    #random.shuffle(lista)
+   # print (lista[0])
+    archivo = open((nombreJugador+".txt"), "r")
+    tiempo=int(archivo.readline(7))
+   # print(tiempo)
+    matriz=0
+    for linea in archivo.readlines():
+        cambio=linea.split()
+        if(cambio[0]=='-2'):
+           # print(linea)
+            matriz=1
+            #linea=linea+1
+        if(matriz==0):
+   
+            agregar (linea,MatrizUsuario2)
+        else:
+            agregar(linea,MatrizCompu)
+    MatrizCompu=MatrizCompu[1:]
+    MatrizUsuario=MatrizUsuario2
+    #print(MatrizUsuario)
+   # print(MatrizCompu)
+   # escribir(matriz)
+
+def Guardar(lista,lista2):
     limite = len(lista)
     contador=0
-    outfile = open('ricardo.txt', 'w') # Indicamos el valor 'w'.
-    outfile.write(str(TiempoJuego))
+    outfile = open((nombreJugador+'.txt'), 'w') # Indicamos el valor 'w'.
+    outfile.write(str(tiempo))
     outfile.write("\n")
+   # print(limite)
     while (contador<limite):
          columnas=len(lista[0])-1
          contador2=0
          
          while (contador2<columnas):
+             
              outfile.write(str(lista[contador][contador2])+" ")
 
              contador2=contador2+1
          outfile.write(str(lista[contador][contador2]))
          outfile.write("\n")
          contador=contador+1
+    outfile.write("-2")
+    outfile.write("\n")
+    limite = len(lista2)
+    contador=0
+    while (contador<limite):
+        columnas=len(lista[0])-1
+        contador2=0
+         
+        while (contador2<columnas):
+            outfile.write(str(lista2[contador][contador2])+" ")
+
+            contador2=contador2+1
+        outfile.write(str(lista2[contador][contador2]))
+        outfile.write("\n")
+        contador=contador+1
     
     outfile.close()
 #==========================================================
