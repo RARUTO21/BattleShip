@@ -269,11 +269,10 @@ def agregar(linea,matriz):
 def cargarArchivo():
     global tiempo
     global MatrizCompu
-    #lista=["Archivo1.txt","Archivo2.txt","Archivo3.txt","Archivo4.txt"]
-    #random.shuffle(lista)
+    lista=["Archivo1.txt","Archivo2.txt","Archivo3.txt","Archivo4.txt"]
+    random.shuffle(lista)
    # print (lista[0])
-    archivo = open("ricardo.txt", "r")
-    tiempo=int(archivo.readline(2))
+    archivo = open(lista[0], "r")
     
     for linea in archivo.readlines():
         agregar (linea,MatrizCompu)
