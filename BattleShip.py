@@ -1,3 +1,4 @@
+# PAQUETES REQUERIDOS A TRAVES DEL PROGRAMA
 from tkinter.filedialog import *
 from tkinter import *
 from tkinter import ttk
@@ -7,17 +8,16 @@ import threading
 import time
 import math
 import os.path
+#===================================================
 
+#  VARIABLES DE USO GLOBAL 
 nombreJugador = ""
 TiempoJuego=0
 listaRecord = []
 turno = True
-
 ganador = False
 nombreGanador = ""
-
 cantBarcos = [None,4,3,2,1]
-
 MatrizUsuario=[ ['0','0','0','0','0','0','0','0','0','0'],
                 ['0','0','0','0','0','0','0','0','0','0'],
                 ['0','0','0','0','0','0','0','0','0','0'],
@@ -30,33 +30,26 @@ MatrizUsuario=[ ['0','0','0','0','0','0','0','0','0','0'],
                 ['0','0','0','0','0','0','0','0','0','0']]
 
 MatrizUsuario2 = []
-
 matrizCompu =   []
-
 matrizCopiaUsuario = []
-
 matrizCopiaCompu = []
-
-
-#MatrizCompu=[]
 numeroBarco=1
+#===================================================
 
-
+#Funcion que esconde desde el inicio del programa las demas ventanas para que solo se vea la del menu
 def iniciar():
         ventanaPonerBarcos.withdraw()
         ventanaJuego.withdraw()
         ventanaRecords.withdraw()
-        #ventanaMenu.withdraw()
-        #None
-
-
-#Configuracion de la ventana principal
+        
+#Configuracion de la ventana principal de menu
 ventanaMenu = Tk()
 ventanaMenu.title("Battleship")
 ventanaMenu.geometry("1280x768")
 ventanaMenu.config(bg="gray25")
 ventanaMenu.resizable(0,0)
 
+#Configuracion de la ventana de nueva partida donde se ponen los barcos
 ventanaPonerBarcos = Tk()
 ventanaPonerBarcos.title("Juego Nuevo")
 ventanaPonerBarcos.geometry("1280x768")
@@ -64,25 +57,24 @@ ventanaPonerBarcos.config(bg="dodgerBlue3")
 ventanaPonerBarcos.resizable(0,0)
 #=====================================
 
-#           TopLevels
+# Configuracion de la ventana del juego que almacenara la matriz de botones
 ventanaJuego = Toplevel()
 ventanaJuego.title("Juego")
 ventanaJuego.config(bg="gray25")
 ventanaJuego.resizable(0,0)
 
-
+# Configuracion de la ventana de registro de los puntajes de los jugadores
 ventanaRecords = Toplevel()
 ventanaRecords.title("Puntajes")
 ventanaRecords.config(bg="white")
 ventanaRecords.resizable(0,0)
 ventanaRecords.wm_geometry("1066x650")
-
 #=====================================TopLevels
 
-#             Frames
+# Frame: Contenedor tipo panel que puede albergar objetos. Se usara para almacenar los botones de las matrices del juego
 frameVentanaJuego = Frame(ventanaJuego,bg="black",bd=0)
 frameVentanaJuego.pack()
-
+#=======================================
 
 def ord_seleccion(lista):
     """ Ordena una lista de elementos según el método de selección.
@@ -124,25 +116,18 @@ def agregarNombreRecord():
     limite=len(listaRecord)
     contador=0
     while(contador<limite):
-        print("CHCKPNT 3")
         if(nombreJugador==listaRecord[contador][0]):
-            print("CHCKPNT 4")
             if(TiempoJuego<=int(listaRecord[contador][1])):
-                print("CHCKPNT 5")
                 listaRecord[contador][1]=str(TiempoJuego)
                 ord_seleccion(listaRecord)
-                print(listaRecord)
                 return True
             else:
                 return False
         else:
             contador=contador+1
-    print("CHECKPOINT #2")
     c(limite)
     listaRecord.append([nombreJugador,str(TiempoJuego)])
-    print("Lista record antes del ord_seleccion: " +str(listaRecord))
     ord_seleccion(listaRecord)
-    print("lalalalala")
     return True
     
 def cargarRecord():
@@ -170,11 +155,11 @@ def existe(archivo):
         return False
 
 
+# Cargamos de una vez en la variable global 'listaRecord' lo que hay en el archivo de puntajes, en forma de lista de sublistas.
 cargarRecord()
-print("El valor de listaRecord es "+str(listaRecord))
 
+# Este objeto es una especie de tabla que puede modelar columnas e introducir elementos, se usa para ver la lista de puntajes
 tablaPuntaje = ttk.Treeview(ventanaRecords, height=36, columns=('Nombre del Jugador', 'Tiempo logrado'))
-#tablaPuntaje.geometry("1280x768")
 tablaPuntaje["columns"] = ("Posicion","Nombre del Jugador","Tiempo logrado")
 tablaPuntaje.column("Posicion")
 tablaPuntaje.heading('#0', text='Posicion', anchor=CENTER)
@@ -182,7 +167,9 @@ tablaPuntaje.column("Nombre del Jugador")
 tablaPuntaje.heading('#1', text='Nombre del Jugador', anchor=CENTER)
 tablaPuntaje.column("Tiempo logrado")
 tablaPuntaje.heading('#2', text='Tiempo logrado', anchor=CENTER)
+#======================================================================================================
 
+# Escribe en la tabla de puntajes cada elemento que hay en el archivo 'puntajes.txt'
 def escribirPuntajes():
         tablaPuntaje.delete(*tablaPuntaje.get_children())
         ord_seleccion(listaRecord)
@@ -193,27 +180,26 @@ def escribirPuntajes():
                 t = str(h) + ":" + str(m) + ":" + str(s)
                 tablaPuntaje.insert("" ,i,text=str(i+1),values=(listaRecord[i][0],t))
         
-
+# Colocamos de una vez la tabla con los puntajes actuales del juego
 tablaPuntaje.place(x=0,y=0)
 
 #=====================================Frames
 
 #       Acciones de interfaz
+# En el menu, al seleccionar "Cerrar Programa" se llamara a la siguiente funcioon
 def cerrarPrograma():
         if messagebox.askyesno("Salir","Está seguro que desea salir?"):
                 ventanaJuego.destroy()
 
+# Tira una bomba en una posicion (x,y) de la matriz deseada
 def tirarBomba(matriz,x,y,botones,jugador):
     pegar(matriz,x,y)
-    if jugador:
+    if jugador: #Verifica si el turno es del jugador
         crearMatrizBotonesJ()
     else:
         crearMatrizBotonesC()
 
-    #refrescarBoton(matriz,x,y,botones,jugador) # P R O B A R   P A P U  : V
-
-
-def refrescarBoton(matriz,x,y,botones,jugador): #PROBAR QUE FUNCIONE XQ TIENE UNA PULGA
+def refrescarBoton(matriz,x,y,botones,jugador): #NO SIRVIO (LASTIMA) Se supone que no habria que crear toda una matriz de botones sino solo refrescar donde se jugo
     btn = 0
     if jugador:
         if matriz[x][y] == "0":
@@ -241,6 +227,7 @@ def refrescarBoton(matriz,x,y,botones,jugador): #PROBAR QUE FUNCIONE XQ TIENE UN
         
 #==========================================================Acciones de interfaz
 
+# Opcion del menu donde se guarda el estado de la partida actual y se sale al menu
 def salvarYSalir():
         global MatrizUsuario2
         global MatrizUsuario
@@ -276,7 +263,7 @@ def Guardar(lista,lista2):
     outfile = open((nombreJugador+'.txt'), 'w') # Indicamos el valor 'w'.
     outfile.write(str(TiempoJuego))
     outfile.write("\n")
-   # print(limite)
+   
     while (contador<limite):
          columnas=len(lista[0])-1
          contador2=0
@@ -342,11 +329,12 @@ def Guardar(lista,lista2):
     
     outfile.close()
 
-
+# Reestablece las matrices a como deberian estar cuando comenzo la partida
 def reiniciarMatriz():
         matrizCompu = matrizCopiaCompu
         MatrizUsuario = matrizCopiaUsuario
 
+# Reinicia el estado de una partida para comenzar desde cero (0)
 def reiniciarJuego():
         global TiempoJuego
         global ganador
@@ -361,7 +349,7 @@ def reiniciarJuego():
                 crearMatrizBotonesC()
         
 
-#               Menu Ventana Juego
+#               Menu Ventana Juego: Donde se establece que opciones existira en el menu para salir y/o guardar y/o reiniciar una partida
 barraMenu = Menu(ventanaJuego)
 menuJuego = Menu(barraMenu)
 barraMenu.add_cascade(label="Juego", menu = menuJuego)
@@ -379,8 +367,6 @@ fondoMenu = PhotoImage(file = "Images/Battleship2.gif")
 fondoPonerBarcos = PhotoImage(file= "Images/Battleship3.gif")
 
 cuadroCeleste = PhotoImage(file="Images/celeste2.gif")
-cuadroAzul = PhotoImage(file="Images/azul2.gif")
-cuadroRojo = PhotoImage(file="Images/rojo2.gif")
 
 barco = PhotoImage(file= "Images/barco3.gif")
 tocado = PhotoImage(file= "Images/tocado.gif")
@@ -421,7 +407,8 @@ nombreJugador = simpledialog.askstring("Digite su nombre", prompt = ' ', parent=
 messagebox.showinfo("Confirmacion","Su nombre es " + nombreJugador)
 #==========================================================DataEntry y MessageBox
 
-def preguntarXY():
+        # ALGORITMO QUE SIRVE PARA JUGAR TANTO EL HUMANO COMO LA MAQUINA Y CALCULA EL GANADOR
+def preguntarXY(): 
     global turno
     global ganador
 
@@ -430,22 +417,14 @@ def preguntarXY():
             letras = ["A","B","C","D","E","F","G","H","I","J"]
             numeros = [1,2,3,4,5,6,7,8,9,10]
             posicion = simpledialog.askstring("Lanzar bomba",initialvalue='A,1', prompt = ' ', parent=ventanaJuego)
-            print(posicion)
             
             try:
-                
                 posicion = posicion.split(',',1)
-                print(posicion)
-                print(1)
-                print(type(posicion[0]))
-                print(type(eval(posicion[1])))
                 if(type(eval(posicion[1])) != int):
-                    print(2)
                     messagebox.showinfo("Error","Debe ingresar un numero en la segunda posicion.")
                     preguntarXY()
                     
                 elif( eval(posicion[1]) < 0 or eval(posicion[1]) > 10 ):
-                    print(3)
                     messagebox.showinfo("Error","Debe ingresar un numero entre 1 y 10.")
                     preguntarXY()
                 
@@ -454,24 +433,26 @@ def preguntarXY():
                     preguntarXY()
                     
                 try:
-                    prueba = letras.index(posicion[0])
+                    prueba = letras.index(posicion[0].upper())
                 except:
                     messagebox.showinfo("Error","Debe ingresar una letra entre A y J.")
                     preguntarXY()
                 
-                
                 y = numeros.index(eval(posicion[1]))
-                x = letras.index(posicion[0])
+                x = letras.index(posicion[0].upper())
+                
                 tirarBomba(matrizCompu,x,y,matrizBotonesC,False)
+                
                 if ganar(matrizCompu):
+                        
                         ganador = True
                         messagebox.showinfo("Felicidades " + str(nombreJugador),"Me has ganado!")
-                        print("C H E C K P O I N T")
+                        
                         if agregarNombreRecord():
                                 guardarRecord()
-                                print("El record actual es: " +str(listaRecord))
+                                
                 turno = False
-                print(posicion)
+                
                 if not ganador:
                         AI()
                         if ganar(MatrizUsuario):
@@ -498,6 +479,8 @@ def pegar(matriz,x,y):
         matriz[x][y]='-1'# si no lo destruye y no pega agua lo marco como pegado y devuelve "pegado"
         return "pegado"
 
+
+# Sirve para continuar una partida anteriormente guardada
 def reanudarPartida():
         if existe(nombreJugador + ".txt"):
                 cargarPartida()
@@ -511,34 +494,42 @@ def reanudarPartida():
 
 #               Matrices:       Juego y  Botones
 
+
+# Esto es un boton de control que se ve en el menu
 btnCargarPartida = Button(ventanaMenu,text="Cargar Partida",relief=RAISED,command=reanudarPartida)
 btnCargarPartida.place(x=100,y=400)
 
-
+# Funcion que invoca a la ventana de nuevo juego para poner los barcos antes de comenzar el juego
 def ubicarBarcos():
         ventanaMenu.withdraw()
         ventanaPonerBarcos.deiconify()
 
+# Boton de control que hace que las ventanas cambien y desaparezcan algunas para aparecer otras. En este caso hace aparecer por medio de la funcion de arriba, lo que dice arriba.
 btnNuevoJuego = Button(ventanaMenu,text="Nueva Partida", relief=RAISED,command=ubicarBarcos)
 btnNuevoJuego.place(x=100,y=300)
 
-
+# Configuracion para cambiar de vista en las ventanas 
 def mostrarPuntajes():
         ventanaMenu.withdraw()
         ventanaPonerBarcos.withdraw()
         ventanaJuego.withdraw()
         ventanaRecords.deiconify()
         escribirPuntajes()
+
+# Boton de control de la ventana menu para redireccionarse a la ventana que tiene los puntajes
 btnVerPuntajes = Button(ventanaMenu,text="Ver Puntajes", relief=RAISED,command=mostrarPuntajes)
 btnVerPuntajes.place(x=100,y=500)
 
+# Configuracion para devolverse de una ventana a otra
 def volverPuntajesMenu():
         ventanaMenu.deiconify()
         ventanaRecords.withdraw()
 
+# Boton que aplica la configuracion de la funcion de arriba
 btnAtrasPuntajes = Button(ventanaRecords,text="Volver",relief=RAISED,command=volverPuntajesMenu)
 btnAtrasPuntajes.place(x=900,y=100)
 
+# Configuracion para devolverse de una venta a otra junto con los valores que    P U D I E R O N    haber sido modificados para iniciar un juego nuevo
 def volverNuevoJuegoMenu():
         global cantBarcos
         global MatrizUsuario
@@ -560,11 +551,12 @@ def volverNuevoJuegoMenu():
         actualizarMatrizPreeliminar()
         
 
+# Boton de control para devolverse en caso de no querer iniciar un nuevo juego
 btnAtrasNuevoJuego = Button(ventanaPonerBarcos,text="Volver",relief=RAISED,command=volverNuevoJuegoMenu)
 btnAtrasNuevoJuego.place(x=10,y=500)
  
 
-#       C O N F I G U R A C I O N   D E L   N U E V O    J U E G O
+#       C O N F I G U R A C I O N   D E L   N U E V O    J U E G O     E N      L A     V E N T A N A    D E    P O N E R    L O S    B A R C O S
 
 textoMatriz = ""
 for i in MatrizUsuario:
@@ -574,14 +566,19 @@ estilo1 = ("Time 32 bold")
 lblMatrizPreeliminar = Label(ventanaPonerBarcos,text=textoMatriz,font=estilo1)
 lblMatrizPreeliminar.config(bg="dodgerBlue3")
 lblMatrizPreeliminar.place(x=600,y=200)
+
+# Esta funcion cambia la matriz de texto a su contenido actual para que el usuario vea donde van quedando los barcos que va posicionando para ponerlos a jugar
 def actualizarMatrizPreeliminar():
         texto = ""
         for i in MatrizUsuario:
                 texto+=str(i)
                 texto+="\n"
         lblMatrizPreeliminar.config(text=texto,font=estilo1,bg="dodgerBlue3")
+
+# De una vez actualizamos la matriz para que el usuario vaya viendo la matriz aunque sea vacia con puros ceros '0'
 actualizarMatrizPreeliminar()
 
+# Objetos de la ventana Partida Nueva, para preparar la matriz de barcos
 lblIndicesLetras = Label(ventanaPonerBarcos,text="ABCDEFGHIJ",wraplength=1,font=estilo1)
 lblIndicesLetras.config(bg="dodgerBlue3")
 lblIndicesLetras.place(x=560,y=200)
@@ -613,27 +610,28 @@ comboOrientacion.config(state="readonly")
 comboOrientacion["values"] = ["Horizontal","Vertical"]
 comboOrientacion.current(0)
 comboOrientacion.place(x=190,y=200,height = 15, width= 100)
+#=================================================================================
 
-
-
+# Si ya se han colocado todos los barcos necesarios para jugar, entonces esta funcion devuelve verdadero, para poder asi habilitar el boton de jugar y comenzar el juego
 def habilitarBotonJugar():
-        if cantBarcos[1] == 0 and cantBarcos[2] == 0 and cantBarcos[3] == 0 and cantBarcos[4] == 0:
-                btnJugar.config(state=NORMAL)
+        if cantBarcos[1] == 0 and cantBarcos[2] == 0 and cantBarcos[3] == 0 and cantBarcos[4] == 0: # Si ya no quedan barcos por poner
+                btnJugar.config(state=NORMAL) #Con esto se habilita el boton
 
-def colocarBarco():
-        letras = ["A","B","C","D","E","F","G","H","I","J"]
-        numeros = ["1","2","3","4","5","6","7","8","9","10"]
-        y = numeros.index(comboNumeros.get())
-        x = letras.index(comboLetras.get())
-        size = eval(comboSize.get())
-        orientacion = comboOrientacion.get()
-        print(MatrizUsuario)
-        if(cantBarcos[size] != 0):
-                if PosicionarBarco(x,y,size,orientacion):
-                        actualizarMatrizPreeliminar()
-                        cantBarcos[size]-=1
-                        print("Cantidad de barcos: " + str(cantBarcos))
-                        habilitarBotonJugar()
+# Funcion que ubica o no el barco en la matriz preeliminar para ir viendo como van a quedar posicionados. PD: Una vez puesto el barco, no se puede cambiar. A menos que empiece una nueva partida (otra vez)
+def colocarBarco(): 
+        letras = ["A","B","C","D","E","F","G","H","I","J"] # Letras validas. Al tenerlo en una lista asi es mas facil de llamar los indices de la matriz, pues estos comienzan de [0,N-1]
+        numeros = ["1","2","3","4","5","6","7","8","9","10"] # Numeros validos. Al tenerlo en una lista asi es mas facil de llamar los indices de la matriz, pues estos comienzan de [0,N-1]
+        y = numeros.index(comboNumeros.get())   #Posicion numero con valor actual del correspondiente combobox 
+        x = letras.index(comboLetras.get())     #Posicion letra con valor actual del correspondiente combobox 
+        size = eval(comboSize.get())            #Tamaño del barco de acuerdo con valor actual del correspondiente combobox 
+        orientacion = comboOrientacion.get()    #Orientacion definida en el combobox y con valor actual al seleccionado correspondiente
+        
+        if(cantBarcos[size] != 0):              #Si aun quedan barcos por ponder de ese tamaño: 
+                if PosicionarBarco(x,y,size,orientacion): #Si se puede poner el barco ahi:
+                        actualizarMatrizPreeliminar()     #Actualizamos la matriz preeliminar para que el usuario lo vea
+                        cantBarcos[size]-=1               #Disminuimos la cantidad de barcos restantes de ese tamaño
+                        
+                        habilitarBotonJugar()             #Verifica si se puede habilitar el boton de jugar o no todavia
                 else:
                         messagebox.showinfo("Error","No es posible colocar este barco aqui")
                         
@@ -641,30 +639,30 @@ def colocarBarco():
                 messagebox.showinfo("Error","No quedan barcos de "+str(size)+" casilla(s)")
         
         
-btnPonerBarco  = Button(ventanaPonerBarcos,text="Poner")
-btnPonerBarco.config(command=colocarBarco)
-btnPonerBarco.place(x=300,y=200)
+btnPonerBarco  = Button(ventanaPonerBarcos,text="Poner")  #Boton que va poniendo barcos
+btnPonerBarco.config(command=colocarBarco)                #Se le asocia el comando de colocar barcos
+btnPonerBarco.place(x=300,y=200)                          #Se ubica el boton en el plano X,Y de la ventana
 
-def comenzarNuevoJuego():
-        global TiempoJuego
-        cargarRecord()
-        cargarArchivo()
-        crearMatrizBotonesJ()
-        crearMatrizBotonesC()
-        ventanaPonerBarcos.withdraw()
-        ventanaJuego.deiconify()
-        TiempoJuego = 0
-        matrizCopiaUsuario = MatrizUsuario
+def comenzarNuevoJuego():                                 #Este algoritmo prepara lo necesario para iniciar una nueva partida de esta manera:
+        global TiempoJuego                      
+        cargarRecord()                                    #Se carga el archivo con los puntajes y se almacenan en una lista en caso de que haya que agregarle un nuevo puntaje
+        cargarArchivo()                                   #Esta funcion le asigna aleatoriamente una matriz de las 4 que hay para que la compu tenga posicionados sus barcos
+        crearMatrizBotonesJ()                             #Crea la matriz de botones del jugador 
+        crearMatrizBotonesC()                             #Crea la matriz de botones de la compu
+        ventanaPonerBarcos.withdraw()                     #DESaparece la ventana de poner barcos
+        ventanaJuego.deiconify()                          #APARECE la ventana de jugar
+        TiempoJuego = 0                                   #Pone el tiempo de juego en cero (0) para iniciar desde cero por supuesto
+        matrizCopiaUsuario = MatrizUsuario                #Hace un respaldo de la matriz en caso de que el usuario quiera reiniciar la partida
 
-btnJugar = Button(ventanaPonerBarcos,text="Jugar",command=comenzarNuevoJuego)
+btnJugar = Button(ventanaPonerBarcos,text="Jugar",command=comenzarNuevoJuego)   #Boton que permite aparecer la ventana de jugar
 btnJugar.place(x=100,y=500)
-btnJugar.config(state=DISABLED)
+btnJugar.config(state=DISABLED)         #Se establece deshabilitado para poder habilitarlo cuando todos los barcos han sido posicionados en la nueva partida por comenzar
 
 
-
+#=========================================================================================================================================================
 
 #============================================================================
-matrizBotonesJ= [ [0,0,0,0,0,0,0,0,0,0],
+matrizBotonesJ= [ [0,0,0,0,0,0,0,0,0,0],                #Inicia en ceros pero luego a cada posicion se le asigna un boton
                   [0,0,0,0,0,0,0,0,0,0],
                   [0,0,0,0,0,0,0,0,0,0],
                   [0,0,0,0,0,0,0,0,0,0],
@@ -676,7 +674,7 @@ matrizBotonesJ= [ [0,0,0,0,0,0,0,0,0,0],
                   [0,0,0,0,0,0,0,0,0,0] ]
 
 matrizBotonesC= [ [0,0,0,0,0,0,0,0,0,0],
-                  [0,0,0,0,0,0,0,0,0,0],
+                  [0,0,0,0,0,0,0,0,0,0],                #Lo mismo pasa aqui que con la matriz de arriba
                   [0,0,0,0,0,0,0,0,0,0],
                   [0,0,0,0,0,0,0,0,0,0],
                   [0,0,0,0,0,0,0,0,0,0],
@@ -686,6 +684,7 @@ matrizBotonesC= [ [0,0,0,0,0,0,0,0,0,0],
                   [0,0,0,0,0,0,0,0,0,0],
                   [0,0,0,0,0,0,0,0,0,0] ]
 
+# Funcion que devuelve los botones que se ponen en los bordes de las matrices para saber su Letra,Numero correspondiente
 def obtenerBotonIndice(parent,row,column):
         numeros = ["",indice1,indice2,indice3,indice4,indice5,indice6,indice7,indice8,indice9,indice10]
         letras = ["",indiceA,indiceB,indiceC,indiceD,indiceE,indiceF,indiceG,indiceH,indiceI,indiceJ]
@@ -696,41 +695,41 @@ def obtenerBotonIndice(parent,row,column):
         if column == 0:
           return Button(parent,image = letras[row], background="blue3", activebackground = "blue",state=DISABLED)
 
-
+# Esta funcion crea los botones que el jugador va a poder ver pero no tocar con las imagenes de barquitos y todas esas cosas.
 def crearMatrizBotonesJ():
     global matrizBotonesJ
     global MatrizUsuario
     
     for i in range(0,10):
         for j in range(0,10):
-            if i == 0: #Fila 0
+            if i == 0: #Fila 0 -> Los numeros del borde
                 btnIndiceColumna = obtenerBotonIndice(frameVentanaJuego,i,j+1)
                 btnIndiceColumna.grid(row = i,column = j+1)
-            if j == 0: #Columna 0
+            if j == 0: #Columna 0 -> Las letras del borde
                 btnIndiceFila = obtenerBotonIndice(frameVentanaJuego,i+1,j)
                 btnIndiceFila.grid(row = i+1,column = j)
 
-            if MatrizUsuario[i][j] == "0":
+            if MatrizUsuario[i][j] == "0": # Este boton es el que se ve con el cuadro celeste (cuadroCeleste)
                 btn = Button(frameVentanaJuego,image = cuadroCeleste,background="blue3",activebackground="blue",state=DISABLED)
                 btn.grid(row = i+1, column = j+1)
                 matrizBotonesJ[i][j] = btn
                 
-            elif MatrizUsuario[i][j] == "-1":
+            elif MatrizUsuario[i][j] == "-1": # Este boton es el que se ve cuando se toca un barco (Tocado)
                 btn = Button(frameVentanaJuego,image = tocado,background="blue3",activebackground="blue",state=DISABLED)
                 btn.grid(row = i+1, column = j+1)
                 matrizBotonesJ[i][j] = btn
 
-            elif MatrizUsuario[i][j] == "X":
+            elif MatrizUsuario[i][j] == "X":  # Este boton aparece cuando un barco ha sido destruido por completo (Destruido)
                 btn = Button(frameVentanaJuego,image = derribado,background="blue3",activebackground="blue",state=DISABLED)
                 btn.grid(row = i+1, column = j+1)
                 matrizBotonesJ[i][j] = btn
                 
-            elif MatrizUsuario[i][j] == "A":
+            elif MatrizUsuario[i][j] == "A":  # Este boton aparece si se ha bombeado una casilla sin nada mas que agua (Agua)
                 btn = Button(frameVentanaJuego,image = agua,background="blue3",activebackground="blue",state=DISABLED)
                 btn.grid(row = i+1, column = j+1)
                 matrizBotonesJ[i][j] = btn
             
-            else:
+            else:                             # Sino este cuadro equivale a un barco :)
                 btn = Button(frameVentanaJuego,image = barco,background="blue3",activebackground="blue",state=DISABLED)
                 btn.grid(row = i+1, column = j+1)
                 matrizBotonesJ[i][j] = btn
@@ -738,7 +737,7 @@ def crearMatrizBotonesJ():
                                 
 
 
-def crearMatrizBotonesC():
+def crearMatrizBotonesC(): # Mismo principio que la de arriba, solo que no muestra los barcos (sino no tendria chiste el juego)
     global matrizBotonesC
     global matrizCompu
     
@@ -746,7 +745,7 @@ def crearMatrizBotonesC():
         for j in range(11,21):
 
             # BOTON ESPECIAL -> ATACAR COMPU
-            if i==11 and j==11:
+            if i==11 and j==11: #Este es el boton que el usuario presiona para atacar a la computadora
                 btnAtacar = Button(frameVentanaJuego,image=atacar,background="blue3",activebackground="blue",command=preguntarXY)
                 btnAtacar.grid(row=i-11,column=j)
                 
@@ -784,16 +783,17 @@ def crearMatrizBotonesC():
 #==========================================================Botones
 
 #           ARTIFICIAL INTELLIGENCE
+#Este es el algoritmo para que la computadora ataque al jugador
 def AI():
-    x = randint(0,9)
+    x = randint(0,9)    #Se genera un X,Y random para atacar
     y = randint(0,9)
+
+    #Si no ha sido atacado ese X,Y anteriormente
     if MatrizUsuario[x][y] != "X" and MatrizUsuario[x][y] != "-1" and MatrizUsuario[x][y] != "A":
-        print("X: " + str(x) + " Y: " + str(y))
-        print(MatrizUsuario[x][y])
-        tirarBomba(MatrizUsuario,x,y,matrizBotonesJ,True)
-        return
-    else:
-        return AI()
+        tirarBomba(MatrizUsuario,x,y,matrizBotonesJ,True) #A bombardear al humano
+        return #Y a terminar el turno
+    else: #Sino
+        return AI() #Intentenlo de nuevo hasta que lo logre
 #==========================================================AI
 
 #==========================================================Archivos
@@ -806,7 +806,6 @@ def cargarArchivo():
     global MatrizCompu
     lista=["Archivo1.txt","Archivo2.txt","Archivo3.txt","Archivo4.txt"]
     random.shuffle(lista)
-   # print (lista[0])
     archivo = open(lista[0], "r")
     
     for linea in archivo.readlines():
@@ -831,7 +830,7 @@ def cargarPartida():
         if(cambio[0]=='-2'):
            
             matriz=1
-            #linea=linea+1
+            
         elif(cambio[0]=='-3'):
            matriz=2
         elif(cambio[0]=='-4'):
@@ -852,15 +851,7 @@ def cargarPartida():
     matrizCopiaCompu=matrizCopiaCompu[1:]
     matrizCopiaUsuario=matrizCopiaUsuario[1:]
     MatrizUsuario=MatrizUsuario2
-    print(MatrizUsuario)
-    print("matriz copia")
-    print(matrizCopiaUsuario)
-    print("matriz copia")
-    print(matrizCopiaCompu)
-    print(matrizCompu)
-   # escribir(matriz)
-
-
+  
 #==========================================================
 
         
@@ -918,7 +909,6 @@ def cabe(x,y,tamaño,orientacion):
             if(MatrizUsuario[x][y]=='0'):
                 y=y+1
                 contador=contador+1
-                print(contador)
             else:# si lo encontrado no es un 0(agua) entonces se retorna false
                  return False
         # si habia solo agua, se llama a una función que se fija si hay limite de agua que impida su colocación
@@ -1008,7 +998,6 @@ def bordesV(x,y,tamaño):
             if(MatrizUsuario[x][y+1]=='0'):
                 vacio=vacio+1
                 x=x+1
-                print("while")
             else:
                 return False
         
@@ -1031,8 +1020,7 @@ def bordesV(x,y,tamaño):
                 return False
         
     if(x2==0):
-        print(MatrizUsuario[x][tamaño])# si la x es 0 entonces solo revisa el limite inferior
-        if(MatrizUsuario[tamaño][y]=='0'):
+        if(MatrizUsuario[tamaño][y]=='0'): # si la x es 0 entonces solo revisa el limite inferior
             return True
         return False
     elif(x2==9):# si la x es 9 entonces solo revisa el limite superior
@@ -1062,7 +1050,7 @@ def asignar(x,y,tamaño,orientacion):
             MatrizUsuario[x][y]=str(numeroBarco)#recorre la matriz horizontalmente y le asigna a cada balor el numero de barco por el que se va
             y=y+1
             contador=contador+1
-            print(contador)
+            
            
     else:
         contador=0
@@ -1119,6 +1107,7 @@ iniciar()
 
 # ___________ Finalmente ___________
 
+#Esto hace que exista un contador que avance solo segundo a segundo y se pueda visualizar el reloj
 Crono = threading.Thread(target=Cronometro)
 Crono.start()
 Inicio=threading.Thread(target=iniciar)
