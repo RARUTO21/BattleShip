@@ -6,13 +6,16 @@ import random
 import threading
 import time
 import math
+import os.path
 
 nombreJugador = ""
 TiempoJuego=0
-
+listaRecord = []
+cantBarcos = [None,4,3,2,1]
 turno = True
 
 ganador = False
+nombreGanador = ""
 
 MatrizUsuario=[ ['0','0','0','0','0','0','0','0','0','0'],
                 ['0','0','0','0','0','0','0','0','0','0'],
@@ -25,6 +28,8 @@ MatrizUsuario=[ ['0','0','0','0','0','0','0','0','0','0'],
                 ['0','0','0','0','0','0','0','0','0','0'],
                 ['0','0','0','0','0','0','0','0','0','0']]
 
+MatrizUsuario2 = []
+
 matrizCompu =   [ ]
 
 
@@ -35,6 +40,7 @@ numeroBarco=1
 def iniciar():
         ventanaPonerBarcos.withdraw()
         ventanaJuego.withdraw()
+        ventanaRecords.withdraw()
         #ventanaMenu.withdraw()
         #None
 
@@ -45,9 +51,13 @@ ventanaMenu.title("Battleship")
 ventanaMenu.geometry("1280x768")
 ventanaMenu.config(bg="gray25")
 ventanaMenu.resizable(0,0)
+
+ventanaPonerBarcos = Tk()
+ventanaPonerBarcos.title("Juego Nuevo")
+ventanaPonerBarcos.geometry("1280x768")
+ventanaPonerBarcos.config(bg="dodgerBlue3")
+ventanaPonerBarcos.resizable(0,0)
 #=====================================
-
-
 
 #           TopLevels
 ventanaJuego = Toplevel()
@@ -56,11 +66,11 @@ ventanaJuego.config(bg="gray25")
 ventanaJuego.resizable(0,0)
 
 
-ventanaPonerBarcos = Tk()
-ventanaPonerBarcos.title("Juego Nuevo")
-ventanaPonerBarcos.geometry("1280x768")
-ventanaPonerBarcos.config(bg="dodgerBlue3")
-ventanaPonerBarcos.resizable(0,0)
+ventanaRecords = Toplevel()
+ventanaRecords.title("Puntajes")
+ventanaRecords.config(bg="white")
+ventanaRecords.resizable(0,0)
+ventanaRecords.wm_geometry("1066x650")
 
 #=====================================TopLevels
 
@@ -70,11 +80,85 @@ frameVentanaJuego.pack()
 
 
 
+def buscar_max(lista, ini, fin):
+    """ Devuelve la posición del máximo elemento en un segmento de
+        lista de elementos comparables.
+        Se trabaja sobre lista, que no debe ser vacía.
+        ini es la posición inicial del segmento, debe ser válida.
+        fin es la posición final del segmento, debe ser válida. """
+ 
+    pos_max = ini
+    for i in range(ini+1, fin+1):
+        if lista[i][1] > lista[pos_max][1]:
+            pos_max = i
+    return pos_max
 
-#bouton = Button(ventanaPonerBarcos,text="Hola Mundo")
-#bouton.place(x=500,y=500)
+def agregarNombreRecord():
+    limite=len(listaRecord)
+    contador=0
+    while(contador<limite):
+        if(nombreJugador==listaRecord[contador][0]):
+            if(tiempo<=int(listaRecord[contador][1])):
+                listaRecord[contador][1]=str(tiempoJuego)
+                ord_seleccion(listaRecord)
+                print(listaRecord)
+                return True
+            else:
+                contador=contador+1
+        else:
+            contador=contador+1
+    listaRecord.append([nombreJugador,str(tiempoJuego)])
+    ord_seleccion(listaRecord)
+    print(listaRecord)
+def cargarRecord():
+    if (existe("puntuaciones.txt")):
+        archivo=open("puntuaciones.txt",'r')
+        for linea in archivo.readlines():
+            elemento=linea.split()
+            listaRecord.append(elemento)
+    else:
+        print("no archivo")
+
+def guardarRecord():
+    archivo=open("puntuaciones.txt",'w')
+    limite=len(listaRecord)
+    contador=0
+    while(contador<limite):
+        archivo.write(str(listaRecord[contador][0])+" "+listaRecord[contador][1])
+        archivo.write("\n")
+        contador=contador+1
+
+def existe(archivo):
+    if os.path.exists(archivo):
+        return True
+    else:
+        return False
 
 
+cargarRecord()
+print("El valor de listaRecord es "+str(listaRecord))
+
+tablaPuntaje = ttk.Treeview(ventanaRecords, height=36, columns=('Nombre del Jugador', 'Tiempo logrado'))
+#tablaPuntaje.geometry("1280x768")
+tablaPuntaje["columns"] = ("Posicion","Nombre del Jugador","Tiempo logrado")
+tablaPuntaje.column("Posicion")
+tablaPuntaje.heading('#0', text='Posicion', anchor=CENTER)
+tablaPuntaje.column("Nombre del Jugador")
+tablaPuntaje.heading('#1', text='Nombre del Jugador', anchor=CENTER)
+tablaPuntaje.column("Tiempo logrado")
+tablaPuntaje.heading('#2', text='Tiempo logrado', anchor=CENTER)
+
+def escribirPuntajes():
+        tablaPuntaje.delete(*tablaPuntaje.get_children())
+        for i in range(0,len(listaRecord)):
+                h = eval(listaRecord[1]) // 3600
+                m = eval(listaRecord[1]) // 60
+                s = eval(listaRecord[1]) %  60
+                t = str(h) + ":" + str(m) + ":" + str(s)
+                tablaPuntaje.insert("" ,i-1,text=str(i),values=(listaRecord[0],t))
+        
+
+tablaPuntaje.place(x=0,y=0)
 
 #=====================================Frames
 
@@ -121,12 +205,102 @@ def refrescarBoton(matriz,x,y,botones,jugador): #PROBAR QUE FUNCION XQ TIENE UNA
         
 #==========================================================Acciones de interfaz
 
+def salvarYSalir():
+        global MatrizUsuario2
+        global MatrizUsuario
+        global matrizCompu
+        global turno
+        global ganador
+        global cantBarcos
+        cantBarcos = [None,4,3,2,1]
+        MatrizUsuario2 = []
+        Guardar(MatrizUsuario,matrizCompu)
+        ventanaJuego.withdraw()
+        ventanaPonerBarcos.withdraw()
+        ventanaMenu.deiconify()
+        MatrizUsuario = [ ['0','0','0','0','0','0','0','0','0','0'],
+                          ['0','0','0','0','0','0','0','0','0','0'],
+                          ['0','0','0','0','0','0','0','0','0','0'],
+                          ['0','0','0','0','0','0','0','0','0','0'],
+                          ['0','0','0','0','0','0','0','0','0','0'],
+                          ['0','0','0','0','0','0','0','0','0','0'],
+                          ['0','0','0','0','0','0','0','0','0','0'],
+                          ['0','0','0','0','0','0','0','0','0','0'],
+                          ['0','0','0','0','0','0','0','0','0','0'],
+                          ['0','0','0','0','0','0','0','0','0','0']]
+        matrizCompu = []
+        turno = False
+        ganador = False
+        
+        
+
+def Guardar(lista,lista2):
+    limite = len(lista)
+    contador=0
+    outfile = open((nombreJugador+'.txt'), 'w') # Indicamos el valor 'w'.
+    outfile.write(str(TiempoJuego))
+    outfile.write("\n")
+   # print(limite)
+    while (contador<limite):
+         columnas=len(lista[0])-1
+         contador2=0
+         
+         while (contador2<columnas):
+             
+             outfile.write(str(lista[contador][contador2])+" ")
+
+             contador2=contador2+1
+         outfile.write(str(lista[contador][contador2]))
+         outfile.write("\n")
+         contador=contador+1
+    outfile.write("-2")
+    outfile.write("\n")
+    limite = len(lista2)
+    contador=0
+    while (contador<limite):
+        columnas=len(lista[0])-1
+        contador2=0
+         
+        while (contador2<columnas):
+            outfile.write(str(lista2[contador][contador2])+" ")
+
+            contador2=contador2+1
+        outfile.write(str(lista2[contador][contador2]))
+        outfile.write("\n")
+        contador=contador+1
+    
+    outfile.close()
+
+
+def reiniciarMatriz(matriz):
+        for i in matriz:
+                for j in range(0,len(i)):
+                        if i[j] == 'A':
+                                i[j] = '0'
+                        elif i[j] == '-1' or i[j] == 'X':
+                                i[j] = '1'
+
+def reiniciarJuego():
+        global TiempoJuego
+        global ganador
+        global MatrizUsuario
+        global matrizCompu
+
+        if messagebox.askyesno("Reiniciar juego","Desea reiniciar el juego?"):
+                reiniciarMatriz(matrizCompu)
+                reiniciarMatriz(MatrizUsuario)
+                TiempoJuego = 0
+                ganador = False
+                crearMatrizBotonesJ()
+                crearMatrizBotonesC()
+        
+
 #               Menu Ventana Juego
 barraMenu = Menu(ventanaJuego)
 menuJuego = Menu(barraMenu)
 barraMenu.add_cascade(label="Juego", menu = menuJuego)
-menuJuego.add_command(label="Guardar y salir al menú")#,command = FALTA)
-menuJuego.add_command(label="Reiniciar partida")#,command = FALTA)
+menuJuego.add_command(label="Guardar y salir al menú",command = salvarYSalir)
+menuJuego.add_command(label="Reiniciar partida",command = reiniciarJuego)
 menuJuego.add_separator()
 menuJuego.add_command(label="Cerrar",command = cerrarPrograma)
 
@@ -182,47 +356,65 @@ messagebox.showinfo("Confirmacion","Su nombre es " + nombreJugador)
 #==========================================================DataEntry y MessageBox
 
 def preguntarXY():
-    letras = ["A","B","C","D","E","F","G","H","I","J"]
-    numeros = [1,2,3,4,5,6,7,8,9,10]
-    posicion = simpledialog.askstring("Lanzar bomba",initialvalue='A,1', prompt = ' ', parent=ventanaJuego)
-    print(posicion)
+    global turno
+    global ganador
 
-    try:
-        
-        posicion = posicion.split(',',1)
-        print(posicion)
-        print(1)
-        print(type(posicion[0]))
-        print(type(eval(posicion[1])))
-        if(type(eval(posicion[1])) != int):
-            print(2)
-            messagebox.showinfo("Error","Debe ingresar un numero en la segunda posicion.")
-            preguntarXY()
+    if not ganador:
+    
+            letras = ["A","B","C","D","E","F","G","H","I","J"]
+            numeros = [1,2,3,4,5,6,7,8,9,10]
+            posicion = simpledialog.askstring("Lanzar bomba",initialvalue='A,1', prompt = ' ', parent=ventanaJuego)
+            print(posicion)
             
-        elif( eval(posicion[1]) < 0 or eval(posicion[1]) > 10 ):
-            print(3)
-            messagebox.showinfo("Error","Debe ingresar un numero entre 1 y 10.")
-            preguntarXY()
+            try:
+                
+                posicion = posicion.split(',',1)
+                print(posicion)
+                print(1)
+                print(type(posicion[0]))
+                print(type(eval(posicion[1])))
+                if(type(eval(posicion[1])) != int):
+                    print(2)
+                    messagebox.showinfo("Error","Debe ingresar un numero en la segunda posicion.")
+                    preguntarXY()
+                    
+                elif( eval(posicion[1]) < 0 or eval(posicion[1]) > 10 ):
+                    print(3)
+                    messagebox.showinfo("Error","Debe ingresar un numero entre 1 y 10.")
+                    preguntarXY()
+                
+                if type(posicion[1]) != str:
+                    messagebox.showinfo("Error","Debe ingresar una letra en la primera posicion.")
+                    preguntarXY()
+                    
+                try:
+                    prueba = letras.index(posicion[0])
+                except:
+                    messagebox.showinfo("Error","Debe ingresar una letra entre A y J.")
+                    preguntarXY()
+                
+                
+                y = numeros.index(eval(posicion[1]))
+                x = letras.index(posicion[0])
+                tirarBomba(matrizCompu,x,y,matrizBotonesC,False)
+                if ganar(matrizCompu):
+                        ganador = True
+                        messagebox.showinfo("Felicidades " + str(nombreJugador),"Me has ganado!")
+                        agregarNombreRecord()
+                        guardarRecord()
+                turno = False
+                print(posicion)
+                if not ganador:
+                        AI()
+                        if ganar(MatrizUsuario):
+                                ganador = True
+                                messagebox.showinfo("Has perdido!","Mejor suerte la proxima " + str(nombreJugador))                                    
+                        turno = True
+         
+            except:
+                messagebox.showinfo("Error","Entrada invalida")
+                preguntarXY()
         
-        if type(posicion[1]) != str:
-            messagebox.showinfo("Error","Debe ingresar una letra en la primera posicion.")
-            preguntarXY()
-            
-        try:
-            prueba = letras.index(posicion[0])
-        except:
-            messagebox.showinfo("Error","Debe ingresar una letra entre A y J.")
-            preguntarXY()
-        
-        
-        y = numeros.index(eval(posicion[1]))
-        x = letras.index(posicion[0])
-        tirarBomba(matrizCompu,x,y,matrizBotonesC,False)
-        print(posicion)
- 
-    except:
-        messagebox.showinfo("Error","Entrada invalida")
-        preguntarXY()
         
 
 def pegar(matriz,x,y):
@@ -238,11 +430,20 @@ def pegar(matriz,x,y):
         matriz[x][y]='-1'# si no lo destruye y no pega agua lo marco como pegado y devuelve "pegado"
         return "pegado"
 
-
+def reanudarPartida():
+        if existe(nombreJugador + ".txt"):
+                cargarPartida()
+                ventanaMenu.withdraw()
+                crearMatrizBotonesJ()
+                crearMatrizBotonesC()
+                ventanaPonerBarcos.withdraw()
+                ventanaJuego.deiconify()
+        else:
+                messagebox.showinfo("Error al cargar partida","No existe una partida guardada de este jugador")
 
 #               Matrices:       Juego y  Botones
 
-btnCargarPartida = Button(ventanaMenu,text="Cargar Partida",relief=RAISED)
+btnCargarPartida = Button(ventanaMenu,text="Cargar Partida",relief=RAISED,command=reanudarPartida)
 btnCargarPartida.place(x=100,y=400)
 
 
@@ -253,6 +454,21 @@ def ubicarBarcos():
 btnNuevoJuego = Button(ventanaMenu,text="Nueva Partida", relief=RAISED,command=ubicarBarcos)
 btnNuevoJuego.place(x=100,y=300)
 
+
+def mostrarPuntajes():
+        ventanaMenu.withdraw()
+        ventanaPonerBarcos.withdraw()
+        ventanaJuego.withdraw()
+        ventanaRecords.deiconify()
+btnVerPuntajes = Button(ventanaMenu,text="Ver Puntajes", relief=RAISED,command=mostrarPuntajes)
+btnVerPuntajes.place(x=100,y=500)
+
+def volverPuntajesMenu():
+        ventanaMenu.deiconify()
+        ventanaRecords.withdraw()
+
+btnAtrasPuntajes = Button(ventanaRecords,text="Volver",relief=RAISED,command=volverPuntajesMenu)
+btnAtrasPuntajes.place(x=900,y=100)
  
 
 #       C O N F I G U R A C I O N   D E L   N U E V O    J U E G O
@@ -305,7 +521,7 @@ comboOrientacion["values"] = ["Horizontal","Vertical"]
 comboOrientacion.current(0)
 comboOrientacion.place(x=190,y=200,height = 15, width= 100)
 
-cantBarcos = [None,4,3,2,1]
+
 
 def habilitarBotonJugar():
         if cantBarcos[1] == 0 and cantBarcos[2] == 0 and cantBarcos[3] == 0 and cantBarcos[4] == 0:
@@ -318,19 +534,19 @@ def colocarBarco():
         x = letras.index(comboLetras.get())
         size = eval(comboSize.get())
         orientacion = comboOrientacion.get()
-
-        if cabe(x,y,size,orientacion):
-                 if(cantBarcos[size] != 0):
-                         PosicionarBarco(x,y,size,orientacion)
-                         actualizarMatrizPreeliminar()
-                         cantBarcos[size]-=1
-                         print(cantBarcos)
-                         habilitarBotonJugar()
-                 else:
-                         messagebox.showinfo("Error","No quedan barcos de "+str(size)+" casilla(s)")
-                         
+        print(MatrizUsuario)
+        if(cantBarcos[size] != 0):
+                if PosicionarBarco(x,y,size,orientacion):
+                        actualizarMatrizPreeliminar()
+                        cantBarcos[size]-=1
+                        print("Cantidad de barcos: " + str(cantBarcos))
+                        habilitarBotonJugar()
+                else:
+                        messagebox.showinfo("Error","No es posible colocar este barco aqui")
+                        
         else:
-                messagebox.showinfo("Error","No es posible colocar este barco aqui")
+                messagebox.showinfo("Error","No quedan barcos de "+str(size)+" casilla(s)")
+        
         
 btnPonerBarco  = Button(ventanaPonerBarcos,text="Poner")
 btnPonerBarco.config(command=colocarBarco)
@@ -338,11 +554,13 @@ btnPonerBarco.place(x=300,y=200)
 
 def comenzarNuevoJuego():
         global TiempoJuego
+        cargarArchivo()
         crearMatrizBotonesJ()
         crearMatrizBotonesC()
         ventanaPonerBarcos.withdraw()
         ventanaJuego.deiconify()
         TiempoJuego = 0
+        #jugarPartida()
 
 btnJugar = Button(ventanaPonerBarcos,text="Jugar",command=comenzarNuevoJuego)
 btnJugar.place(x=100,y=500)
@@ -489,25 +707,23 @@ def AI():
 def jugarPartida():
     global ganador
     global turno
+    #global nombreGanador
     
     while not ganador:
-        if turno:
-            preguntarXY()
-            turno = False
-        else:
-            AI()
-            turno = True
+        if not turno:
+                None
+            
+
 #==========================================================AI
 
 
 #==========================================================Archivos
-def agregar(linea):
+def agregar(linea,matriz):
     linea= linea.split()
     #validar que los datos de la matriz sean los que queremos
-    MatrizCompu.append(linea)
-    
+    matriz.append(linea)
+
 def cargarArchivo():
-    global tiempo
     global MatrizCompu
     lista=["Archivo1.txt","Archivo2.txt","Archivo3.txt","Archivo4.txt"]
     random.shuffle(lista)
@@ -515,20 +731,19 @@ def cargarArchivo():
     archivo = open(lista[0], "r")
     
     for linea in archivo.readlines():
-        agregar (linea)
-    MatrizCompu=MatrizCompu[1:]
-    print(MatrizCompu)
+        agregar (linea,matrizCompu)
+   # print(MatrizCompu)
    # escribir(matriz)
 
 def cargarPartida():
-    global tiempo
-    global MatrizCompu
+    global TiempoJuego
+    global matrizCompu
     global MatrizUsuario
     #lista=["Archivo1.txt","Archivo2.txt","Archivo3.txt","Archivo4.txt"]
     #random.shuffle(lista)
    # print (lista[0])
     archivo = open((nombreJugador+".txt"), "r")
-    tiempo=int(archivo.readline(7))
+    TiempoJuego=int(archivo.readline(7))
    # print(tiempo)
     matriz=0
     for linea in archivo.readlines():
@@ -541,49 +756,16 @@ def cargarPartida():
    
             agregar (linea,MatrizUsuario2)
         else:
-            agregar(linea,MatrizCompu)
-    MatrizCompu=MatrizCompu[1:]
+            agregar(linea,matrizCompu)
+    matrizCompu=matrizCompu[1:]
+    print("Matriz de la compu cargada: ")
+    print(matrizCompu)
     MatrizUsuario=MatrizUsuario2
     #print(MatrizUsuario)
    # print(MatrizCompu)
    # escribir(matriz)
 
-def Guardar(lista,lista2):
-    limite = len(lista)
-    contador=0
-    outfile = open((nombreJugador+'.txt'), 'w') # Indicamos el valor 'w'.
-    outfile.write(str(tiempo))
-    outfile.write("\n")
-   # print(limite)
-    while (contador<limite):
-         columnas=len(lista[0])-1
-         contador2=0
-         
-         while (contador2<columnas):
-             
-             outfile.write(str(lista[contador][contador2])+" ")
 
-             contador2=contador2+1
-         outfile.write(str(lista[contador][contador2]))
-         outfile.write("\n")
-         contador=contador+1
-    outfile.write("-2")
-    outfile.write("\n")
-    limite = len(lista2)
-    contador=0
-    while (contador<limite):
-        columnas=len(lista[0])-1
-        contador2=0
-         
-        while (contador2<columnas):
-            outfile.write(str(lista2[contador][contador2])+" ")
-
-            contador2=contador2+1
-        outfile.write(str(lista2[contador][contador2]))
-        outfile.write("\n")
-        contador=contador+1
-    
-    outfile.close()
 #==========================================================
 
         
@@ -818,7 +1000,21 @@ def destruido(matriz,x,y):
         return False
     else:
         return True
-        
+
+def ganar(matriz):
+        filas=0
+        while(filas<10):
+                columnas=0
+                while(columnas<10):
+                        if(matriz[filas][columnas]=='0' or matriz[filas][columnas]=='-1' or matriz[filas][columnas]=='X' or matriz[filas][columnas]=='A'):
+                                columnas=columnas +1
+                        else:
+                                return False
+                filas=filas+1
+        return True
+
+
+
         
 #==========================================================
 
@@ -838,47 +1034,6 @@ ventanaJuego.mainloop()
 
 
 Crono.join()
-<<<<<<< Updated upstream
-Inicio.join()'''
-Prueba de Barcos
-=======
 Inicio.join()
-''' Prueba de Barcos
->>>>>>> Stashed changes
-cargarArchivo()
-#print(pegar(8,1))
-#print(pegar(9,1))
-print(PosicionarBarco(0,0,4,"H"))
-print(PosicionarBarco(0,7,2,"H"))
-print(PosicionarBarco(0,9,1,"H"))
-print(PosicionarBarco(1,0,4,"H"))
-print(PosicionarBarco(2,0,4,"H"))
-print(PosicionarBarco(2,5,4,"H"))
-print(PosicionarBarco(4,8,1,"V"))
-print(PosicionarBarco(6,4,2,"V"))
-print(PosicionarBarco(9,0,4,"H"))
-print(PosicionarBarco(9,8,2,"H"))
-print(PosicionarBarco(6,7,2,"V"))
-print(PosicionarBarco(5,2,6,"V"))
-#print(tiempo)
-
-print(MatrizCompu)
-print(len(MatrizCompu))
-print(pegar(MatrizUsuario,0,5))
-print(pegar(MatrizUsuario,0,8))
-print(pegar(MatrizUsuario,0,8))
-print(pegar(MatrizUsuario,0,7))
-Guardar(MatrizUsuario)
-x=0
-while(x<10):
-    print(MatrizUsuario[x])
-    x=x+1
-print("numero barco "+str(numeroBarco))
-'''
-
-
-
-
-'''
 
 
