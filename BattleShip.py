@@ -11,11 +11,12 @@ import os.path
 nombreJugador = ""
 TiempoJuego=0
 listaRecord = []
-cantBarcos = [None,4,3,2,1]
 turno = True
 
 ganador = False
 nombreGanador = ""
+
+cantBarcos = [None,4,3,2,1]
 
 MatrizUsuario=[ ['0','0','0','0','0','0','0','0','0','0'],
                 ['0','0','0','0','0','0','0','0','0','0'],
@@ -30,7 +31,11 @@ MatrizUsuario=[ ['0','0','0','0','0','0','0','0','0','0'],
 
 MatrizUsuario2 = []
 
-matrizCompu =   [ ]
+matrizCompu =   []
+
+matrizCopiaUsuario = []
+
+matrizCopiaCompu
 
 
 #MatrizCompu=[]
@@ -79,6 +84,27 @@ frameVentanaJuego = Frame(ventanaJuego,bg="black",bd=0)
 frameVentanaJuego.pack()
 
 
+def ord_seleccion(lista):
+    """ Ordena una lista de elementos según el método de selección.
+        Pre: los elementos de la lista deben ser comparables.
+        Post: la lista está ordenada. """
+ 
+    # n = posicion final del segmento a tratar, comienza en len(lista)-1*
+    n = len(lista)-1
+ 
+    # cicla mientras haya elementos para ordenar (2 o más elementos)
+    
+    while n > 0:
+        # p es la posicion del mayor valor del segmento
+        p = buscar_max(lista, 0, n)
+ 
+        # intercambia el valor que está en p con el valor que
+        # está en la última posición del segmento
+        lista[p], lista[n] = lista[n], lista[p]
+ 
+   
+        # reduce el segmento en 1
+        n = n - 1
 
 def buscar_max(lista, ini, fin):
     """ Devuelve la posición del máximo elemento en un segmento de
@@ -94,22 +120,31 @@ def buscar_max(lista, ini, fin):
     return pos_max
 
 def agregarNombreRecord():
+    global listaRecord
     limite=len(listaRecord)
     contador=0
     while(contador<limite):
+        print("CHCKPNT 3")
         if(nombreJugador==listaRecord[contador][0]):
-            if(tiempo<=int(listaRecord[contador][1])):
-                listaRecord[contador][1]=str(tiempoJuego)
+            print("CHCKPNT 4")
+            if(TiempoJuego<=int(listaRecord[contador][1])):
+                print("CHCKPNT 5")
+                listaRecord[contador][1]=str(TiempoJuego)
                 ord_seleccion(listaRecord)
                 print(listaRecord)
                 return True
             else:
-                contador=contador+1
+                return False
         else:
             contador=contador+1
-    listaRecord.append([nombreJugador,str(tiempoJuego)])
+    print("CHECKPOINT #2")
+    print(limite)
+    listaRecord.append([nombreJugador,str(TiempoJuego)])
+    print("Lista record antes del ord_seleccion: " +str(listaRecord))
     ord_seleccion(listaRecord)
-    print(listaRecord)
+    print("lalalalala")
+    return True
+    
 def cargarRecord():
     if (existe("puntuaciones.txt")):
         archivo=open("puntuaciones.txt",'r')
@@ -151,11 +186,11 @@ tablaPuntaje.heading('#2', text='Tiempo logrado', anchor=CENTER)
 def escribirPuntajes():
         tablaPuntaje.delete(*tablaPuntaje.get_children())
         for i in range(0,len(listaRecord)):
-                h = eval(listaRecord[1]) // 3600
-                m = eval(listaRecord[1]) // 60
-                s = eval(listaRecord[1]) %  60
+                h = eval(listaRecord[i][1]) // 3600
+                m = eval(listaRecord[i][1]) // 60
+                s = eval(listaRecord[i][1]) %  60
                 t = str(h) + ":" + str(m) + ":" + str(s)
-                tablaPuntaje.insert("" ,i-1,text=str(i),values=(listaRecord[0],t))
+                tablaPuntaje.insert("" ,i,text=str(i+1),values=(listaRecord[i][0],t))
         
 
 tablaPuntaje.place(x=0,y=0)
@@ -177,7 +212,7 @@ def tirarBomba(matriz,x,y,botones,jugador):
     #refrescarBoton(matriz,x,y,botones,jugador) # P R O B A R   P A P U  : V
 
 
-def refrescarBoton(matriz,x,y,botones,jugador): #PROBAR QUE FUNCION XQ TIENE UNA PULGA
+def refrescarBoton(matriz,x,y,botones,jugador): #PROBAR QUE FUNCIONE XQ TIENE UNA PULGA
     btn = 0
     if jugador:
         if matriz[x][y] == "0":
@@ -260,12 +295,47 @@ def Guardar(lista,lista2):
     while (contador<limite):
         columnas=len(lista[0])-1
         contador2=0
-         
+       
         while (contador2<columnas):
             outfile.write(str(lista2[contador][contador2])+" ")
 
             contador2=contador2+1
         outfile.write(str(lista2[contador][contador2]))
+        outfile.write("\n")
+        contador=contador+1
+
+    outfile.write("-3")
+    outfile.write("\n")
+    limite = 10
+    contador=0
+    
+    while (contador<limite):
+        columnas=9
+        contador2=0
+        
+        while (contador2<columnas):
+           
+            outfile.write(str(matrizCopiaCompu[contador][contador2])+" ")
+
+            contador2=contador2+1
+        outfile.write(str(matrizCopiaCompu[contador][contador2]))
+        outfile.write("\n")
+        contador=contador+1
+
+    outfile.write("-4")
+    outfile.write("\n")
+    limite = 9
+    contador=0
+    while (contador<limite):
+        columnas=9
+        contador2=0
+        
+        while (contador2<columnas):
+            
+            outfile.write(str(matrizCopiaUsuario[contador][contador2])+" ")
+
+            contador2=contador2+1
+        outfile.write(str(matrizCopiaUsuario[contador][contador2]))
         outfile.write("\n")
         contador=contador+1
     
@@ -400,8 +470,10 @@ def preguntarXY():
                 if ganar(matrizCompu):
                         ganador = True
                         messagebox.showinfo("Felicidades " + str(nombreJugador),"Me has ganado!")
-                        agregarNombreRecord()
-                        guardarRecord()
+                        print("C H E C K P O I N T")
+                        if agregarNombreRecord():
+                                guardarRecord()
+                                print("El record actual es: " +str(listaRecord))
                 turno = False
                 print(posicion)
                 if not ganador:
@@ -460,6 +532,7 @@ def mostrarPuntajes():
         ventanaPonerBarcos.withdraw()
         ventanaJuego.withdraw()
         ventanaRecords.deiconify()
+        escribirPuntajes()
 btnVerPuntajes = Button(ventanaMenu,text="Ver Puntajes", relief=RAISED,command=mostrarPuntajes)
 btnVerPuntajes.place(x=100,y=500)
 
@@ -469,6 +542,28 @@ def volverPuntajesMenu():
 
 btnAtrasPuntajes = Button(ventanaRecords,text="Volver",relief=RAISED,command=volverPuntajesMenu)
 btnAtrasPuntajes.place(x=900,y=100)
+
+def volverNuevoJuegoMenu():
+        global cantBarcos
+        global MatrizUsuario
+        
+        ventanaPonerBarcos.withdraw()
+        ventanaMenu.deiconify()
+        cantBarcos = [None,4,3,2,1]
+
+        MatrizUsuario=[ ['0','0','0','0','0','0','0','0','0','0'],
+                        ['0','0','0','0','0','0','0','0','0','0'],
+                        ['0','0','0','0','0','0','0','0','0','0'],
+                        ['0','0','0','0','0','0','0','0','0','0'],
+                        ['0','0','0','0','0','0','0','0','0','0'],
+                        ['0','0','0','0','0','0','0','0','0','0'],
+                        ['0','0','0','0','0','0','0','0','0','0'],
+                        ['0','0','0','0','0','0','0','0','0','0'],
+                        ['0','0','0','0','0','0','0','0','0','0'],
+                        ['0','0','0','0','0','0','0','0','0','0']]
+
+btnAtrasNuevoJuego = Button(ventanaPonerBarcos,text="Volver",relief=RAISED,command=volverNuevoJuegoMenu)
+btnAtrasNuevoJuego.place(x=10,y=500)
  
 
 #       C O N F I G U R A C I O N   D E L   N U E V O    J U E G O
@@ -554,13 +649,14 @@ btnPonerBarco.place(x=300,y=200)
 
 def comenzarNuevoJuego():
         global TiempoJuego
+        cargarRecord()
         cargarArchivo()
         crearMatrizBotonesJ()
         crearMatrizBotonesC()
         ventanaPonerBarcos.withdraw()
         ventanaJuego.deiconify()
         TiempoJuego = 0
-        #jugarPartida()
+        
 
 btnJugar = Button(ventanaPonerBarcos,text="Jugar",command=comenzarNuevoJuego)
 btnJugar.place(x=100,y=500)
@@ -702,21 +798,6 @@ def AI():
         return AI()
 #==========================================================AI
 
-
-#       COMENZAR EL JUEGO
-def jugarPartida():
-    global ganador
-    global turno
-    #global nombreGanador
-    
-    while not ganador:
-        if not turno:
-                None
-            
-
-#==========================================================AI
-
-
 #==========================================================Archivos
 def agregar(linea,matriz):
     linea= linea.split()
@@ -738,31 +819,46 @@ def cargarArchivo():
 def cargarPartida():
     global TiempoJuego
     global matrizCompu
+    global matrizCopiaCompu
+    global matrizCopiaUsuario
     global MatrizUsuario
-    #lista=["Archivo1.txt","Archivo2.txt","Archivo3.txt","Archivo4.txt"]
-    #random.shuffle(lista)
-   # print (lista[0])
+    
     archivo = open((nombreJugador+".txt"), "r")
-    TiempoJuego=int(archivo.readline(7))
-   # print(tiempo)
+    tiempoJuego=int(archivo.readline(7))
+   
     matriz=0
     for linea in archivo.readlines():
         cambio=linea.split()
         if(cambio[0]=='-2'):
-           # print(linea)
+           
             matriz=1
             #linea=linea+1
+        elif(cambio[0]=='-3'):
+           matriz=2
+        elif(cambio[0]=='-4'):
+            matriz=3
+            
         if(matriz==0):
    
             agregar (linea,MatrizUsuario2)
-        else:
+        elif(matriz==1):
             agregar(linea,matrizCompu)
+        elif(matriz==2):
+            agregar(linea,matrizCopiaCompu)
+        else:
+            agregar(linea,matrizCopiaUsuario)
+            
+            
     matrizCompu=matrizCompu[1:]
-    print("Matriz de la compu cargada: ")
-    print(matrizCompu)
+    matrizCopiaCompu=matrizCopiaCompu[1:]
+    matrizCopiaUsuario=matrizCopiaUsuario[1:]
     MatrizUsuario=MatrizUsuario2
-    #print(MatrizUsuario)
-   # print(MatrizCompu)
+    print(MatrizUsuario)
+    print("matriz copia")
+    print(matrizCopiaUsuario)
+    print("matriz copia")
+    print(matrizCopiaCompu)
+    print(matrizCompu)
    # escribir(matriz)
 
 
