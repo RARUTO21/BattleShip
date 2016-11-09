@@ -35,7 +35,7 @@ matrizCompu =   []
 
 matrizCopiaUsuario = []
 
-matrizCopiaCompu
+matrizCopiaCompu = []
 
 
 #MatrizCompu=[]
@@ -115,7 +115,7 @@ def buscar_max(lista, ini, fin):
  
     pos_max = ini
     for i in range(ini+1, fin+1):
-        if lista[i][1] > lista[pos_max][1]:
+        if int(lista[i][1]) < int(lista[pos_max][1]):
             pos_max = i
     return pos_max
 
@@ -138,7 +138,7 @@ def agregarNombreRecord():
         else:
             contador=contador+1
     print("CHECKPOINT #2")
-    print(limite)
+    c(limite)
     listaRecord.append([nombreJugador,str(TiempoJuego)])
     print("Lista record antes del ord_seleccion: " +str(listaRecord))
     ord_seleccion(listaRecord)
@@ -185,6 +185,7 @@ tablaPuntaje.heading('#2', text='Tiempo logrado', anchor=CENTER)
 
 def escribirPuntajes():
         tablaPuntaje.delete(*tablaPuntaje.get_children())
+        ord_seleccion(listaRecord)
         for i in range(0,len(listaRecord)):
                 h = eval(listaRecord[i][1]) // 3600
                 m = eval(listaRecord[i][1]) // 60
@@ -342,13 +343,9 @@ def Guardar(lista,lista2):
     outfile.close()
 
 
-def reiniciarMatriz(matriz):
-        for i in matriz:
-                for j in range(0,len(i)):
-                        if i[j] == 'A':
-                                i[j] = '0'
-                        elif i[j] == '-1' or i[j] == 'X':
-                                i[j] = '1'
+def reiniciarMatriz():
+        matrizCompu = matrizCopiaCompu
+        MatrizUsuario = matrizCopiaUsuario
 
 def reiniciarJuego():
         global TiempoJuego
@@ -357,8 +354,7 @@ def reiniciarJuego():
         global matrizCompu
 
         if messagebox.askyesno("Reiniciar juego","Desea reiniciar el juego?"):
-                reiniciarMatriz(matrizCompu)
-                reiniciarMatriz(MatrizUsuario)
+                reiniciarMatriz()
                 TiempoJuego = 0
                 ganador = False
                 crearMatrizBotonesJ()
@@ -561,6 +557,8 @@ def volverNuevoJuegoMenu():
                         ['0','0','0','0','0','0','0','0','0','0'],
                         ['0','0','0','0','0','0','0','0','0','0'],
                         ['0','0','0','0','0','0','0','0','0','0']]
+        actualizarMatrizPreeliminar()
+        
 
 btnAtrasNuevoJuego = Button(ventanaPonerBarcos,text="Volver",relief=RAISED,command=volverNuevoJuegoMenu)
 btnAtrasNuevoJuego.place(x=10,y=500)
@@ -656,7 +654,7 @@ def comenzarNuevoJuego():
         ventanaPonerBarcos.withdraw()
         ventanaJuego.deiconify()
         TiempoJuego = 0
-        
+        matrizCopiaUsuario = MatrizUsuario
 
 btnJugar = Button(ventanaPonerBarcos,text="Jugar",command=comenzarNuevoJuego)
 btnJugar.place(x=100,y=500)
@@ -813,8 +811,9 @@ def cargarArchivo():
     
     for linea in archivo.readlines():
         agregar (linea,matrizCompu)
-   # print(MatrizCompu)
-   # escribir(matriz)
+        
+    matrizCopiaCompu = matrizCompu
+   
 
 def cargarPartida():
     global TiempoJuego
