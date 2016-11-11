@@ -2,3 +2,4 @@ https://hg.python.org/cpython/file/3.5/Lib/copy.py
 https://docs.python.org/3/library/copy.html
 http://librosweb.es/libro/algoritmos_python/capitulo_19/ordenamiento_por_seleccion.html
 http://www.genbetadev.com/python/multiprocesamiento-en-python-threads-a-fondo-introduccion
+http://www.ehowenespanol.com/definiar-variables-globales-python-como_247872/
