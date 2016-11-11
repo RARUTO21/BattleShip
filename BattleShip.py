@@ -402,7 +402,6 @@ fondoMenu = PhotoImage(file = "Images/Battleship2.gif")
 fondoPonerBarcos = PhotoImage(file= "Images/Battleship3.gif")
 
 cuadroCeleste = PhotoImage(file="Images/celeste2.gif")
-cuadroAzul = PhotoImage(file="Images/azul2.gif")
 cuadroRojo = PhotoImage(file="Images/rojo2.gif")
 
 barco = PhotoImage(file= "Images/barco3.gif")
@@ -478,14 +477,14 @@ def preguntarXY():
                     preguntarXY()
                     
                 try:
-                    prueba = letras.index(posicion[0])
+                    prueba = letras.index(posicion[0].upper())
                 except:
                     messagebox.showinfo("Error","Debe ingresar una letra entre A y J.")
                     preguntarXY()
                 
                 
                 y = numeros.index(eval(posicion[1]))
-                x = letras.index(posicion[0])
+                x = letras.index(posicion[0].upper())
                 tirarBomba(matrizCompu,x,y,matrizBotonesC,False)
                 if ganar(matrizCompu):
                         ganador = True
@@ -606,7 +605,7 @@ for i in MatrizUsuario:
 estilo1 = ("Time 32 bold") 
 lblMatrizPreeliminar = Label(ventanaPonerBarcos,text=textoMatriz,font=estilo1)
 lblMatrizPreeliminar.config(bg="dodgerBlue3")
-lblMatrizPreeliminar.place(x=600,y=200)
+lblMatrizPreeliminar.place(x=500,y=100)
 
 # Esta funcion cambia la matriz de texto a su contenido actual para que el usuario vea donde van quedando los barcos que va posicionando para ponerlos a jugar
 
@@ -622,11 +621,11 @@ actualizarMatrizPreeliminar()
 # Objetos de la ventana Partida Nueva, para preparar la matriz de barcos
 lblIndicesLetras = Label(ventanaPonerBarcos,text="ABCDEFGHIJ",wraplength=1,font=estilo1)
 lblIndicesLetras.config(bg="dodgerBlue3")
-lblIndicesLetras.place(x=560,y=200)
+lblIndicesLetras.place(x=460,y=100)
 
 lblNumeros = Label(ventanaPonerBarcos,text="1     2     3     4     5     6   7     8     9   10",font=estilo1)
 lblNumeros.config(bg="dodgerBlue3")
-lblNumeros.place(x=615,y=160)
+lblNumeros.place(x=515,y=60)
 
 comboLetras = ttk.Combobox(ventanaPonerBarcos)
 comboLetras.config(state="readonly")

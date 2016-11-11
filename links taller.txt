@@ -3,3 +3,21 @@ https://docs.python.org/3/library/copy.html
 http://librosweb.es/libro/algoritmos_python/capitulo_19/ordenamiento_por_seleccion.html
 http://www.genbetadev.com/python/multiprocesamiento-en-python-threads-a-fondo-introduccion
 http://www.ehowenespanol.com/definiar-variables-globales-python-como_247872/
+
+Treeview https://docs.python.org/3.5/library/tkinter.ttk.html
+Combobox (mismo link) https://docs.python.org/3.5/library/tkinter.ttk.html
+Posicionamiento por medio de Grid http://effbot.org/tkinterbook/grid.htm
+Posicionamiento por medio de Grid (otro link) https://www.tutorialspoint.com/python/tk_grid.htm
+Posicionamiento por medio de Place http://effbot.org/tkinterbook/place.htm
+Botón http://effbot.org/tkinterbook/button.htm
+Diálogo de confirmación http://effbot.org/tkinterbook/tkinter-standard-dialogs.htm
+AskString (para meter el X,Y = Letra,Número) http://www-acc.kek.jp/kekb/control/Activity/Python/TkIntro/introduction/intro08.htm
+Label http://effbot.org/tkinterbook/label.htm
+Ventanas de la clase Tk() (todas las ventanas que no sean la ventana del juego) https://www.youtube.com/watch?v=RJB1Ek2Ko_Y
+Ventanas del tipo Toplevel (ventana de juego) https://www.tutorialspoint.com/python/tk_toplevel.htm
+messagebox (mensaje del sistema) http://stackoverflow.com/questions/24405738/tkinter-showinfo-python-3
+funciones en un botón http://effbot.org/zone/tkinter-callbacks.htm
+Fondo del juego http://effbot.org/tkinterbook/photoimage.htm (proveniente de un PhotoImage dentro de un Label)
+Menu del juego http://effbot.org/tkinterbook/menu.htm
+
+
